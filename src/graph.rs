@@ -5,10 +5,31 @@ use std::{
     io::{BufRead, BufReader},
 };
 
+#[derive(Hash, Eq, PartialEq)]
+pub struct EdgeDestination { 
+    dest: usize,
+    weight: isize
+}
+
+impl EdgeDestination { 
+    pub fn new(dest: usize, weight: isize) -> Self { 
+        EdgeDestination { 
+            dest, 
+            weight
+        }
+    }
+}
+
+impl fmt::Debug for EdgeDestination {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} w: {}", self.dest, self.weight)
+    }
+}
+
 #[derive(Hash, Eq, PartialEq, Debug)]
 pub struct Node {
     data: usize,
-    out_going_edges: Vec<usize>,
+    out_going_edges: Vec<EdgeDestination>,
 }
 
 impl fmt::Display for Node {
@@ -25,8 +46,8 @@ impl Node {
         }
     }
 
-    pub fn add_to_edge_list(&mut self, neigh: usize) {
-        self.out_going_edges.push(neigh)
+    pub fn add_to_edge_list(&mut self, neigh: usize, w: isize) {
+        self.out_going_edges.push(EdgeDestination::new(neigh, w));
     }
 }
 
@@ -69,7 +90,7 @@ impl Graph {
                 if let (Ok(source), Ok(dest)) = (source_str.parse(), dest_str.parse()) {
                     graph.add_node(source);
                     graph.add_node(dest);
-                    graph.add_edge(source, dest)
+                    graph.add_edge(source, dest, 1)
                 }
             }
         }
@@ -84,9 +105,9 @@ impl Graph {
         }
     }
 
-    pub fn add_edge(&mut self, src: usize, dest: usize) {
+    pub fn add_edge(&mut self, src: usize, dest: usize, weight: isize) {
         if let Some(node) = self.nodes.get_mut(&src) {
-            node.add_to_edge_list(dest)
+            node.add_to_edge_list(dest, weight)
         } else {
             println!("Source {} not fount", src)
         }
