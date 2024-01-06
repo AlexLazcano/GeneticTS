@@ -90,7 +90,15 @@ impl Graph {
                 if let (Ok(source), Ok(dest)) = (source_str.parse(), dest_str.parse()) {
                     graph.add_node(source);
                     graph.add_node(dest);
-                    graph.add_edge(source, dest, 1)
+                    if let Some(weight_str) = parts.next() { 
+                        if let Ok(weight)  = weight_str.parse() { 
+                            graph.add_edge(source, dest, weight)
+                        }
+                    } else { 
+                        graph.add_edge(source, dest, 1)
+                    }
+                    
+                    
                 }
             }
         }
