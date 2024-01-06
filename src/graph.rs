@@ -119,4 +119,8 @@ impl Graph {
             println!("Source {} not fount", src)
         }
     }
+
+    pub fn get_nodes(&self) -> &HashMap<usize, Node> { 
+        &self.nodes
+    }
 }
