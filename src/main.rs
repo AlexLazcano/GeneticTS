@@ -4,8 +4,11 @@ mod graph;
 use crate::genetic::GeneticAlgorithm;
 use crate::graph::Graph;
 
-fn runGenetic(graph: &Graph) {
-    let g = GeneticAlgorithm::new(graph);
+fn run_genetic(graph: &Graph) {
+    let ga = GeneticAlgorithm::new(graph);
+    let fitnesses = ga.calculate_fitnesses();
+    println!("fitness: {:?}", fitnesses)
+
 }
 
 fn main() {
@@ -16,7 +19,7 @@ fn main() {
     match Graph::new_from_file(filepath) {
         Ok(g) => {
             print!("{}", g);
-            runGenetic(&g);
+            run_genetic(&g);
         }
 
         Err(err) => {

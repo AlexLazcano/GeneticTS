@@ -49,6 +49,16 @@ impl Node {
     pub fn add_to_edge_list(&mut self, neigh: usize, w: isize) {
         self.out_going_edges.push(EdgeDestination::new(neigh, w));
     }
+
+    pub fn get_weight_to(&self, neigh: &usize) -> isize { 
+        for out_node in &self.out_going_edges { 
+            if out_node.dest == *neigh { 
+                return out_node.weight;
+            }
+        }
+        200
+
+    }
 }
 
 #[derive(Debug)]
