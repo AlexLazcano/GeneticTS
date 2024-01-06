@@ -7,13 +7,20 @@ fn main() {
     println!("Hello, world!");
     
     let filepath = "src/graphs/graph1.graph";
+
     
-    if let Err(err) = Graph::new_from_file(filepath) {
-        println!("Error: {}", err);
-    } else { 
+    match Graph::new_from_file(filepath) {
 
+        Ok(g) => { 
+            print!("{}", g);
+            
+        },
 
-    }
+        Err(err) => { 
+            println!("Error: {}", err);
+        }
+        
+    } 
 
 
     

@@ -78,7 +78,7 @@ impl Graph {
         }
     }
 
-    pub fn new_from_file(filepath: &str) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn new_from_file(filepath: &str) -> Result<Graph, Box<dyn std::error::Error>> {
         let file = File::open(filepath)?;
         let reader = BufReader::new(file);
         let mut graph = Graph::new();
@@ -102,9 +102,8 @@ impl Graph {
                 }
             }
         }
-        print!("{}", graph);
 
-        Ok(())
+        Ok(graph)
     }
 
     pub fn add_node(&mut self, id: usize) {
