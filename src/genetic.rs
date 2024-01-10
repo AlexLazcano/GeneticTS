@@ -1,5 +1,5 @@
 use crate::graph::Graph;
-
+use rand::Rng;
 
 pub struct GeneticAlgorithm<'a> {
     graph: &'a Graph,
@@ -39,9 +39,39 @@ impl<'a> GeneticAlgorithm<'a> {
 }
 
 #[derive(Debug)]
-struct Individual {
+pub struct Individual {
     gene: Vec<usize>,
 }
+
+impl Individual { 
+    pub fn order_x_over(p1: &Individual, p2: &Individual) -> Individual  {
+        // let mut rng = rand::thread_rng();
+        // let gene_length = p1.gene.len();
+        // let first = rng.gen_range(0..gene_length);
+        // let second = rng.gen_range(first..gene_length);
+        // FIX: Need to make it a permutation !!!
+        let first: usize = 2;
+        let second:usize  = 6;
+
+        let mut p1_gene = p1.gene.clone();
+        
+        for i in first..second { 
+
+            p1_gene[i] = p2.gene[i];
+        }
+
+        Individual { 
+            gene: p1_gene
+        }
+    }
+
+    pub fn new(gene: Vec<usize>) -> Self { 
+        Individual { 
+            gene
+        }
+    }
+}
+
 trait IndividualFunctions {
     fn fitness(&self, graph: &Graph) -> isize;
     fn cross_over(&self, other: &Self) -> Self;
@@ -70,7 +100,7 @@ impl IndividualFunctions for Individual {
     }
 
     fn cross_over(&self, other: &Self) -> Self {
-        todo!()
+        Individual::order_x_over(self, other)
     }
 
     fn mutate(&self) {
