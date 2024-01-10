@@ -1,5 +1,6 @@
 mod genetic;
 mod graph;
+mod tests;
 
 use crate::genetic::GeneticAlgorithm;
 use crate::graph::Graph;
