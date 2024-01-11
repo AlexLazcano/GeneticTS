@@ -49,16 +49,30 @@ impl Individual {
         // let gene_length = p1.gene.len();
         // let first = rng.gen_range(0..gene_length);
         // let second = rng.gen_range(first..gene_length);
-        // FIX: Need to make it a permutation !!!
-        let first: usize = 2;
-        let second:usize  = 6;
+        let length = p1.gene.len();
+        let first: usize = 1;
+        let last:usize  = 3;
 
+        let p1_slice = &p1.gene[first..last];
         let mut p1_gene = p1.gene.clone();
-        
-        for i in first..second { 
+        // println!("{:?}", p1_slice);
+        let mut j = 0;
+        for i in 0..length { 
+            if i >= first && i < last { 
+                // copy elements from 1 
+                // p1_gene[i] = 1;
+            } else { 
+                // get elements that are not in slice from 2
+                while p1_slice.contains(&p2.gene[j]) {
+                    j += 1
+                }
 
-            p1_gene[i] = p2.gene[i];
+                p1_gene[i] = p2.gene[j];
+                j+=1;
+            }
+
         }
+        
 
         Individual { 
             gene: p1_gene
@@ -72,7 +86,7 @@ impl Individual {
     }
 }
 
-trait IndividualFunctions {
+pub trait IndividualFunctions {
     fn fitness(&self, graph: &Graph) -> isize;
     fn cross_over(&self, other: &Self) -> Self;
     fn mutate(&self);
@@ -89,12 +103,12 @@ impl IndividualFunctions for Individual {
 
         for i in self.gene.iter() {
             fitness += prev.get_weight_to(i);
-            println!("{} f: {}", i, fitness);
+            // println!("{} f: {}", i, fitness);
             prev = nodes.get(i).unwrap();
         }
 
         fitness += prev.get_weight_to(&0);
-        println!("{} f: {}", 0, fitness);
+        // println!("{} f: {}", 0, fitness);
 
         fitness
     }
