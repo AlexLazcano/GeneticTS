@@ -6,7 +6,7 @@ use crate::genetic::GeneticAlgorithm;
 use crate::graph::Graph;
 
 fn run_genetic(graph: &Graph) {
-    let ga = GeneticAlgorithm::new(graph);
+    let ga = GeneticAlgorithm::new(graph, 10);
     let fitnesses = ga.calculate_fitnesses();
     println!("fitness: {:?}", fitnesses)
 
