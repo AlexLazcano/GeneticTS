@@ -15,12 +15,12 @@ pub fn cross_over_test() {
 
     let gene1 = vec![1,2,3,4,5];
     let gene2 = vec![4,3,2,1,5];
-    let p1 = Individual::new(gene1);
-    let p2 = Individual::new(gene2);
+    let mut p1 = Individual::new(gene1);
+    let mut p2 = Individual::new(gene2);
 
-    let offspring1 = Individual::order_x_over(&p1, &p2);
+    let mut offspring1 = Individual::order_x_over(&p1, &p2);
 
-    let offspring2 = Individual::order_x_over(&p2, &p1);
+    let mut offspring2 = Individual::order_x_over(&p2, &p1);
     
    
 
@@ -29,11 +29,16 @@ pub fn cross_over_test() {
     
     match Graph::new_from_file(filepath) {
         Ok(g) => {
-            print!("{}", g);
-            println!("{} {:?} {}", "p1", p1, p1.fitness(&g));
-            println!("{} {:?} {}", "p2", p2, p2.fitness(&g));
-            println!("{} {:?} {}", "o1", offspring1, offspring1.fitness(&g));
-            println!("{} {:?} {}", "o2", offspring2, offspring2.fitness(&g));
+            print!("{}", g); 
+            p1.calculate_fitness(&g);
+            p2.calculate_fitness(&g);
+            offspring1.calculate_fitness(&g);
+            offspring2.calculate_fitness(&g);
+
+            println!("{} {:?} {}", "p1", p1, p1.get_fitness());
+            println!("{} {:?} {}", "p2", p2, p2.get_fitness());
+            println!("{} {:?} {}", "o1", offspring1, offspring1.get_fitness());
+            println!("{} {:?} {}", "o2", offspring2, offspring2.get_fitness());
         }
 
         Err(err) => {

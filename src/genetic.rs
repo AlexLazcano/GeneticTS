@@ -28,7 +28,7 @@ impl<'a> GeneticAlgorithm<'a> {
         sorted_keys.remove(0);
         let mut rng = StepRng::new(2, 13);
         let mut irs: Irs<_> = Irs::default();
-        let individual = Individual { gene: sorted_keys.clone() };
+        let individual = Individual::new(sorted_keys.clone());
         let mut population = Vec::new();
         population.push(individual);
 
@@ -47,22 +47,49 @@ impl<'a> GeneticAlgorithm<'a> {
             }
         }
 
-        println!("{:?}", population);
         return population;
     }
 
-    pub fn calculate_fitnesses(&self) -> Vec<isize> {
+    pub fn print_population(&self) { 
+        println!("{:?}", self.population)
+    }
+    pub fn calculate_fitnesses(&mut self) {
         let g = self.graph;
-        self.population.iter().map(|gene| gene.fitness(g)).collect()
+        for  i in &mut self.population { 
+            i.calculate_fitness(g);
+        }
     }
 }
 
 #[derive(Debug)]
-pub struct Individual {
+pub struct Individual { 
     gene: Vec<usize>,
+    fitness: isize
 }
 
 impl Individual {
+    pub fn get_fitness(&self) -> isize { 
+        self.fitness
+    }
+    pub fn calculate_fitness(&mut self, graph: &Graph) {
+        let nodes = graph.get_nodes();
+        let mut fitness = 0;
+
+        // println!("{} f: {}", 0, fitness);
+        let mut prev = nodes.get(&0).unwrap();
+
+        for i in self.gene.iter() {
+            fitness += prev.get_weight_to(i);
+            // println!("{} f: {}", i, fitness);
+            prev = nodes.get(i).unwrap();
+        }
+
+        fitness += prev.get_weight_to(&0);
+        // println!("{} f: {}", 0, fitness);
+
+        self.fitness = fitness;
+    }
+
     pub fn order_x_over(p1: &Individual, p2: &Individual) -> Individual {
         // let mut rng = rand::thread_rng();
         // let gene_length = p1.gene.len();
@@ -91,39 +118,20 @@ impl Individual {
             }
         }
 
-        Individual { gene: p1_gene }
+        Individual { gene: p1_gene, fitness: 0 }
     }
 
     pub fn new(gene: Vec<usize>) -> Self {
-        Individual { gene }
+        Individual { gene, fitness: 0 }
     }
 }
 
 pub trait IndividualFunctions {
-    fn fitness(&self, graph: &Graph) -> isize;
     fn cross_over(&self, other: &Self) -> Self;
     fn mutate(&self);
 }
 
 impl IndividualFunctions for Individual {
-    fn fitness(&self, graph: &Graph) -> isize {
-        let nodes = graph.get_nodes();
-        let mut fitness = 0;
-
-        // println!("{} f: {}", 0, fitness);
-        let mut prev = nodes.get(&0).unwrap();
-
-        for i in self.gene.iter() {
-            fitness += prev.get_weight_to(i);
-            // println!("{} f: {}", i, fitness);
-            prev = nodes.get(i).unwrap();
-        }
-
-        fitness += prev.get_weight_to(&0);
-        // println!("{} f: {}", 0, fitness);
-
-        fitness
-    }
 
     fn cross_over(&self, other: &Self) -> Self {
         Individual::order_x_over(self, other)
