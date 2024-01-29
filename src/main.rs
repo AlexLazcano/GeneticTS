@@ -6,9 +6,10 @@ use crate::genetic::GeneticAlgorithm;
 use crate::graph::Graph;
 
 fn run_genetic(graph: &Graph) {
-    let mut ga = GeneticAlgorithm::new(graph, 10);
-    ga.calculate_fitnesses();
+    let mut ga = GeneticAlgorithm::new(graph, 20);
+    ga.evaluation();
     ga.print_population();
+    ga.selection();
 
 }
 

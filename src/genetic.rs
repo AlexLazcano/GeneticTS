@@ -1,5 +1,7 @@
 use crate::graph::Graph;
 use rand::rngs::mock::StepRng;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 // use rand::Rng;
 use shuffle::irs::Irs;
 use shuffle::shuffler::Shuffler;
@@ -38,39 +40,71 @@ impl<'a> GeneticAlgorithm<'a> {
                 Ok(_) => {
                     if !population.contains(&Individual::new(sorted_keys.clone())) {
                         population.push(Individual::new(sorted_keys.clone()));
-                    } 
-                },
+                    }
+                }
                 Err(error) => {
                     println!("{:?}", error);
-                },
+                }
             }
         }
 
         return population;
     }
 
-    pub fn print_population(&self) { 
-        for ind in &self.population { 
+    pub fn print_population(&self) {
+        for ind in &self.population {
             println!("{:?} = fit {}", ind.gene, ind.fitness)
         }
     }
     pub fn calculate_fitnesses(&mut self) {
         let g = self.graph;
-        for  i in &mut self.population { 
+        for i in &mut self.population {
             i.calculate_fitness(g);
         }
+    }
+    pub fn evaluation(&mut self) {
+        self.calculate_fitnesses();
         self.population.sort()
+    }
+    pub fn selection(&mut self) {
+        let winners = self.tournament_selection();
+    }
+    pub fn cross_over() {
+        todo!()
+    }
+
+    pub fn replacement() {
+        todo!()
+    }
+    pub fn termination() {
+        todo!()
+    }
+
+    fn tournament_selection(&self) -> Vec<Individual> {
+        let mut rng = thread_rng();
+        let mut remaining: Vec<usize> = (0..self.population.len()).collect();
+        let mut winners = Vec::new();
+
+        remaining.shuffle(&mut rng);
+
+        while remaining.len() >= 2 {
+            let index1 = remaining.pop().unwrap();
+            let index2 = remaining.pop().unwrap();
+
+            winners.push(std::cmp::min(self.population[index1].clone(), self.population[index2].clone()));
+        }
+        winners
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
-pub struct Individual { 
+#[derive(Debug, Eq, PartialEq, Clone)]
+pub struct Individual {
     gene: Vec<usize>,
-    fitness: isize
+    fitness: isize,
 }
 
 impl Individual {
-    pub fn get_fitness(&self) -> isize { 
+    pub fn get_fitness(&self) -> isize {
         self.fitness
     }
     pub fn calculate_fitness(&mut self, graph: &Graph) {
@@ -120,7 +154,10 @@ impl Individual {
             }
         }
 
-        Individual { gene: p1_gene, fitness: 0 }
+        Individual {
+            gene: p1_gene,
+            fitness: 0,
+        }
     }
 
     pub fn new(gene: Vec<usize>) -> Self {
@@ -145,7 +182,6 @@ pub trait IndividualFunctions {
 }
 
 impl IndividualFunctions for Individual {
-
     fn cross_over(&self, other: &Self) -> Self {
         Individual::order_x_over(self, other)
     }
