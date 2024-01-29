@@ -36,10 +36,9 @@ impl<'a> GeneticAlgorithm<'a> {
             let res = irs.shuffle(&mut sorted_keys, &mut rng);
             match res {
                 Ok(_) => {
-                    // let random_individual = Individual { 
-                    //     gene: sorted_keys.clone()
-                    // };
-                    population.push(Individual::new(sorted_keys.clone()));
+                    if !population.contains(&Individual::new(sorted_keys.clone())) {
+                        population.push(Individual::new(sorted_keys.clone()));
+                    } 
                 },
                 Err(error) => {
                     println!("{:?}", error);
@@ -51,17 +50,20 @@ impl<'a> GeneticAlgorithm<'a> {
     }
 
     pub fn print_population(&self) { 
-        println!("{:?}", self.population)
+        for ind in &self.population { 
+            println!("{:?} = fit {}", ind.gene, ind.fitness)
+        }
     }
     pub fn calculate_fitnesses(&mut self) {
         let g = self.graph;
         for  i in &mut self.population { 
             i.calculate_fitness(g);
         }
+        self.population.sort()
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct Individual { 
     gene: Vec<usize>,
     fitness: isize
@@ -126,6 +128,17 @@ impl Individual {
     }
 }
 
+impl PartialOrd for Individual {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.fitness.partial_cmp(&other.fitness)
+    }
+}
+
+impl Ord for Individual {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.fitness.cmp(&other.fitness)
+    }
+}
 pub trait IndividualFunctions {
     fn cross_over(&self, other: &Self) -> Self;
     fn mutate(&self);
