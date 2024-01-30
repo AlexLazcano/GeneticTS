@@ -1,7 +1,7 @@
 #[cfg(test)]
 
-use crate::genetic::Individual;
-use crate::{graph::{Graph, self}, genetic::IndividualFunctions};
+use crate::individual::Individual;
+use crate::{graph::{Graph, self}, individual::IndividualFunctions};
 
 
 #[test]
