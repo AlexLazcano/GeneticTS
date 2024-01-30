@@ -52,8 +52,8 @@ impl<'a> GeneticAlgorithm<'a> {
     }
 
     pub fn print_population(&self) {
-        for ind in &self.population {
-            println!("{:?} = fit {}", ind.gene, ind.fitness)
+        for (i, ind) in self.population.iter().enumerate() {
+            println!("{i}: {:?} = fit {}", ind.gene, ind.fitness)
         }
     }
     pub fn calculate_fitnesses(&mut self) {
@@ -66,12 +66,11 @@ impl<'a> GeneticAlgorithm<'a> {
         self.calculate_fitnesses();
         self.population.sort()
     }
-    pub fn selection(&mut self) {
-        let winners = self.tournament_selection();
+    pub fn selection_reproduction(&mut self) {
+        let mut winners = self.tournament_selection();
+        self.reproduce(&mut winners);
     }
-    pub fn cross_over() {
-        todo!()
-    }
+   
 
     pub fn replacement() {
         todo!()
@@ -94,6 +93,21 @@ impl<'a> GeneticAlgorithm<'a> {
             winners.push(std::cmp::min(self.population[index1].clone(), self.population[index2].clone()));
         }
         winners
+    }
+    fn reproduce(&mut self, parents: &mut Vec<Individual>){ 
+        parents.sort();
+
+        while parents.len() >= 2 { 
+            let parent1 = parents.pop().unwrap();
+            let parent2 = parents.pop().unwrap();
+            let offspring1 = parent1.cross_over(&parent2);
+            let offspring2 = parent2.cross_over(&parent1);
+
+            self.population.push(offspring1);
+            self.population.push(offspring2);
+
+        }
+
     }
 }
 

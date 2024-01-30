@@ -9,8 +9,12 @@ fn run_genetic(graph: &Graph) {
     let mut ga = GeneticAlgorithm::new(graph, 20);
     ga.evaluation();
     ga.print_population();
-    ga.selection();
-
+    for i in 1..=5 {
+        ga.selection_reproduction();
+        ga.evaluation();
+        println!("Round {i} complete");
+    }
+    ga.print_population();
 }
 
 fn main() {
