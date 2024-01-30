@@ -5,7 +5,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-#[derive(Hash, Eq, PartialEq)]
+#[derive(Hash, Eq, PartialEq, Clone)]
 pub struct EdgeDestination { 
     dest: usize,
     weight: isize
@@ -26,7 +26,7 @@ impl fmt::Debug for EdgeDestination {
     }
 }
 
-#[derive(Hash, Eq, PartialEq, Debug)]
+#[derive(Hash, Eq, PartialEq, Debug, Clone)]
 pub struct Node {
     data: usize,
     out_going_edges: Vec<EdgeDestination>,
@@ -61,7 +61,7 @@ impl Node {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Graph {
     nodes: HashMap<usize, Node>,
 }

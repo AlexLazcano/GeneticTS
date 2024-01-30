@@ -1,3 +1,4 @@
+use crate::graph;
 use crate::graph::Graph;
 use crate::individual::Individual;
 use crate::individual::IndividualFunctions;
@@ -7,6 +8,7 @@ use rand::thread_rng;
 // use rand::Rng;
 use shuffle::irs::Irs;
 use shuffle::shuffler::Shuffler;
+use rayon::prelude::*;
 
 pub struct GeneticAlgorithm<'a> {
     graph: &'a Graph,
@@ -22,6 +24,13 @@ impl<'a> GeneticAlgorithm<'a> {
             graph,
             population: pop,
             // population_size: pop_size,
+        }
+    }
+
+    pub fn from_vec(graph: &'a Graph, pop: Vec<Individual>) -> Self {
+        GeneticAlgorithm {
+            graph,
+            population: pop,
         }
     }
 
@@ -64,6 +73,13 @@ impl<'a> GeneticAlgorithm<'a> {
             i.calculate_fitness(g);
         }
     }
+
+    pub fn conc_calculate_fitnesses(&mut self) { 
+        self.population.par_iter_mut().for_each(|individual| { 
+            individual.calculate_fitness(self.graph);
+        })
+
+    }
     pub fn evaluation(&mut self) {
         self.calculate_fitnesses();
         self.population.sort()
@@ -72,7 +88,6 @@ impl<'a> GeneticAlgorithm<'a> {
         let mut winners = self.tournament_selection();
         self.reproduce(&mut winners);
     }
-   
 
     pub fn replacement() {
         todo!()
@@ -92,14 +107,17 @@ impl<'a> GeneticAlgorithm<'a> {
             let index1 = remaining.pop().unwrap();
             let index2 = remaining.pop().unwrap();
 
-            winners.push(std::cmp::min(self.population[index1].clone(), self.population[index2].clone()));
+            winners.push(std::cmp::min(
+                self.population[index1].clone(),
+                self.population[index2].clone(),
+            ));
         }
         winners
     }
-    fn reproduce(&mut self, parents: &mut Vec<Individual>){ 
+    fn reproduce(&mut self, parents: &mut Vec<Individual>) {
         parents.sort();
 
-        while parents.len() >= 2 { 
+        while parents.len() >= 2 {
             let parent1 = parents.pop().unwrap();
             let parent2 = parents.pop().unwrap();
             let offspring1 = parent1.cross_over(&parent2);
@@ -107,8 +125,6 @@ impl<'a> GeneticAlgorithm<'a> {
 
             self.population.push(offspring1);
             self.population.push(offspring2);
-
         }
-
     }
 }
