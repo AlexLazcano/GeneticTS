@@ -1,6 +1,6 @@
 #[cfg(test)]
 use crate::individual::Individual;
-use crate::GeneticAlgorithm;
+use crate::{individual, GeneticAlgorithm};
 use crate::{
     graph::{self, Graph},
     individual::IndividualFunctions,
@@ -71,6 +71,48 @@ pub fn concurrent_calculate_fitness() {
             let elapsed2 = start_time2.elapsed();
             // ga.print_population();
             println!("Concurrent time: {:?}", elapsed2);
+        }
+
+        Err(err) => {
+            println!("Error: {}", err);
+        }
+    }
+}
+
+#[test]
+pub fn concurrent_reproduce() {
+    let gene1 = vec![1, 2, 3, 4, 5];
+
+    let filepath = "src/graphs/graph1.graph";
+
+    let size = 10000;
+
+    match Graph::new_from_file(filepath) {
+        Ok(g) => {
+            let default = Individual::new(gene1);
+            let individuals: Vec<Individual> = vec![default; size];
+
+            let mut ga = GeneticAlgorithm::from_vec(&g, individuals.clone());
+            let mut ga2 = GeneticAlgorithm::from_vec(&g, individuals.clone());
+            let mut clone = individuals.clone();
+            // ga.print_population();
+            println!("before reproduce size: {}", ga.pop_size());
+           
+            let start_time = Instant::now();
+            ga.reproduce(&mut individuals.clone());
+            let elapsed = start_time.elapsed();
+            println!("after seq reproduce size: {}", ga.pop_size());
+            // ga.print_population();
+
+            println!("Sequential time: {:?}", elapsed);
+            let start_time2 = Instant::now();
+            ga2.reproduce_parallel(&mut clone);
+            let elapsed2 = start_time2.elapsed();
+            println!("after par reproduce size: {}", ga2.pop_size());
+            // ga.print_population();
+            println!("Concurrent time: {:?}", elapsed2);
+            assert_eq!(ga.pop_size(), ga2.pop_size(), "Population sizes should be equal");
+
         }
 
         Err(err) => {

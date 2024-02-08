@@ -6,9 +6,10 @@ use rand::rngs::mock::StepRng;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 // use rand::Rng;
+use rayon::prelude::*;
 use shuffle::irs::Irs;
 use shuffle::shuffler::Shuffler;
-use rayon::prelude::*;
+use std::sync::{Arc, Mutex};
 
 pub struct GeneticAlgorithm<'a> {
     graph: &'a Graph,
@@ -32,6 +33,10 @@ impl<'a> GeneticAlgorithm<'a> {
             graph,
             population: pop,
         }
+    }
+
+    pub fn pop_size(&self) -> usize {
+        self.population.len()
     }
 
     fn init_population(graph: &'a Graph, population_size: usize) -> Vec<Individual> {
@@ -74,11 +79,10 @@ impl<'a> GeneticAlgorithm<'a> {
         }
     }
 
-    pub fn conc_calculate_fitnesses(&mut self) { 
-        self.population.par_iter_mut().for_each(|individual| { 
+    pub fn conc_calculate_fitnesses(&mut self) {
+        self.population.par_iter_mut().for_each(|individual| {
             individual.calculate_fitness(self.graph);
         })
-
     }
     pub fn evaluation(&mut self) {
         self.calculate_fitnesses();
@@ -114,7 +118,7 @@ impl<'a> GeneticAlgorithm<'a> {
         }
         winners
     }
-    fn reproduce(&mut self, parents: &mut Vec<Individual>) {
+    pub fn reproduce(&mut self, parents: &mut Vec<Individual>) {
         parents.sort();
 
         while parents.len() >= 2 {
@@ -126,5 +130,39 @@ impl<'a> GeneticAlgorithm<'a> {
             self.population.push(offspring1);
             self.population.push(offspring2);
         }
+    }
+
+    pub fn reproduce_parallel(&mut self, parents: &Vec<Individual>) {
+
+        let result: Vec<_> = parents
+            .par_chunks(2)
+            .map(|chunk| {
+                if chunk.len() == 2 {
+                    let parent1 = &chunk[0];
+                    let parent2 = &chunk[1];
+                    let offspring1 = parent1.cross_over(parent2);
+                    let offspring2 = parent2.cross_over(parent1);
+
+                    vec![offspring1, offspring2]
+                } else {
+                    vec![]
+                }
+            })
+            .fold(
+                || Vec::new(),
+                |mut acc, chunk_result| {
+                    acc.extend(chunk_result);
+                    acc
+                },
+            )
+            .reduce(
+                || Vec::new(),
+                |mut acc1, acc2| {
+                    acc1.extend(acc2);
+                    acc1
+                },
+            );
+
+            self.population.extend(result)
     }
 }
